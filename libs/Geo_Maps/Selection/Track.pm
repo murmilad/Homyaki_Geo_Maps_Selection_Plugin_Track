@@ -41,7 +41,6 @@ sub set_vertexes {
 			$dounded_box->points($bbox_points);
 			my $bounded_center = $dounded_box->centroid;
 			
-Homyaki::Logger::print_log('bbox = ' . Dumper($bbox_points));	
 			$params->{map_center_lat} = $bounded_center->[1];
 			$params->{map_center_lng} = $bounded_center->[0];
 			$params->{bounds_sw_lat} = $bbox_points->[0]->[1];
