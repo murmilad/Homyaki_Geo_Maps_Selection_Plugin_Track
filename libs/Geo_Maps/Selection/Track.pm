@@ -27,7 +27,7 @@ sub set_vertexes {
 		if ($track && scalar($track->{coordinates}) > 0) {
 			Homyaki::Logger::print_log('before del');
 			foreach my $param (grep {$_ =~ /vertex_(\d+)_(lat|lng)/} keys %{$params}){
-				undef  $params->{$param};
+				delete $params->{$param};
 			}
 			Homyaki::Logger::print_log('after del');
 
