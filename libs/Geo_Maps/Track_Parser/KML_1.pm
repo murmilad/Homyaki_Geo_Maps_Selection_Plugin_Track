@@ -30,7 +30,7 @@ sub is_actual_parser {
 	my %h    = @_;
 
 	if (my $kml_hash = XMLin($this->{source})){
-#		Homyaki::Logger::print_log('Homyaki::Geo_Maps::Track_Parser::KML_1 hash = ' . Dumper($kml_hash));
+		Homyaki::Logger::print_log('Homyaki::Geo_Maps::Track_Parser::KML_1 hash = ' . Dumper($kml_hash));
 		if ($kml_hash->{xmlns} =~ /\/kml\/2\./i){
 			$this->{data} = $kml_hash;
 			return 1;
@@ -45,9 +45,25 @@ sub parse {
 	my %h    = @_;
 
 	if ($this->{data}){
-		my $coordinates_str = $this->{data}->{Document}->{Placemark}->{LineString}->{coordinates};
+
+		my $coordinates_hash = {};
+
+		foreach my $kml_snippet_name (keys %{$this->{data}->{Document}->{Placemark}}) {
+			if ($kml_snippet_name eq 'LineString') {
+				$coordinates_hash->{0} = $this->{data}->{Document}->{Placemark}->{$kml_snippet_name}->{coordinates};
+			} elsif ($kml_snippet_name =~ /.*\.kml-(\d+)/i) {
+				$coordinates_hash->{$1} = $this->{data}->{Document}->{Placemark}->{$kml_snippet_name}->{LineString}->{coordinates};
+			}
+		}
+
+		my $coordinates_str;
+
+		foreach my $kml_snippet_number (sort {$a <=> $b} keys %{$coordinates_hash}){
+			$coordinates_str .= $coordinates_hash->{$kml_snippet_number};
+		}
+		
 		my @coordinates;
-		foreach my $coord_line (split("\n", $coordinates_str)) {
+		foreach my $coord_line (split(/\n|\s+/, $coordinates_str)) {
 			if ($coord_line =~ /([-\d\.]+),([-\d\.]+)/){
 				push(@coordinates, [$1,$2]);
 			}
