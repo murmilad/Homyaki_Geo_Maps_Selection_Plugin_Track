@@ -75,7 +75,7 @@ sub parse {
 	}
 
 
-#	Homyaki::Logger::print_log('Homyaki::Geo_Maps::Track_Parser::KML_1 this = ' . Dumper($this));
+	Homyaki::Logger::print_log('Homyaki::Geo_Maps::Track_Parser::KML_1 this = ' . Dumper($this->{coordinates}));
 }
 
 1;

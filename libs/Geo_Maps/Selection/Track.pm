@@ -25,9 +25,11 @@ sub set_vertexes {
 		);
 
 		if ($track && scalar($track->{coordinates}) > 0) {
+			Homyaki::Logger::print_log('before del');
 			foreach my $param (grep {$_ =~ /vertex_(\d+)_(lat|lng)/} keys %{$params}){
-				delete $params->{$param};
+				undef  $params->{$param};
 			}
+			Homyaki::Logger::print_log('after del');
 
 			my $planar_track_contour = Math::Geometry::Planar->new;
 			$planar_track_contour->points($track->{coordinates});
@@ -44,6 +46,7 @@ sub set_vertexes {
 			}
 
 			my $bbox = $planar_track_contour->bbox();
+			Homyaki::Logger::print_log("Homyaki::Geo_Mas::Selection::Track bbox_o  = $bbox");
 			if ($bbox){
 				my $bbox_points = $bbox->points;
 				
@@ -53,10 +56,11 @@ sub set_vertexes {
 			
 				$params->{map_center_lat} = $bounded_center->[1];
 				$params->{map_center_lng} = $bounded_center->[0];
-				$params->{bounds_sw_lat} = $bbox_points->[0]->[1];
-				$params->{bounds_sw_lng} = $bbox_points->[0]->[0];
-				$params->{bounds_ne_lat} = $bbox_points->[3]->[1];
-				$params->{bounds_ne_lng} = $bbox_points->[3]->[0];
+				$params->{bounds_sw_lat} = $bbox_points->[3]->[1];
+				$params->{bounds_sw_lng} = $bbox_points->[3]->[0];
+				$params->{bounds_ne_lat} = $bbox_points->[1]->[1];
+				$params->{bounds_ne_lng} = $bbox_points->[1]->[0];
+				Homyaki::Logger::print_log("Homyaki::Geo_Mas::Selection::Track bbox = " . Dumper($bbox_points));
 			}
 			
 		}
