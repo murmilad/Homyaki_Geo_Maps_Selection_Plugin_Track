@@ -16,12 +16,13 @@ sub get_interface {
 	$body_tag->add_form_element(
 		type => &INPUT_TYPE_FILE,
 		name => 'track_file',
+		&PARAM_ACCEPT => 'application/vnd.google-earth.kml+xml',
 	);
 
 	$body_tag->add_form_element(
 		type => &INPUT_TYPE_DIV,
 		name => 'help',
-		body => 'Please select a tack file.',
+		body => 'Please select a tack file. (KML 2.x)',
 	);
 
 }
