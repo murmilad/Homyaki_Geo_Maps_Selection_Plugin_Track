@@ -31,9 +31,16 @@ sub set_vertexes {
 
 			my $planar_track_contour = Math::Geometry::Planar->new;
 			$planar_track_contour->points($track->{coordinates});
-			for (my $i = 1; $i < scalar(@{$track->{coordinates}}); $i++) {
+
+			my $i;
+			for ($i = 1; $i < scalar(@{$track->{coordinates}}); $i++) {
 				$params->{"vertex_${i}_lat"} = $track->{coordinates}->[$i-1]->[1];
 				$params->{"vertex_${i}_lng"} = $track->{coordinates}->[$i-1]->[0];
+			}
+			for (my $j = scalar(@{$track->{coordinates}}); $j > 0; $j--) {
+				$i++;
+				$params->{"vertex_${i}_lat"} = $track->{coordinates}->[$j-1]->[1] - 0.00003;
+				$params->{"vertex_${i}_lng"} = $track->{coordinates}->[$j-1]->[0] - 0.00003;
 			}
 
 			my $dounded_box = Math::Geometry::Planar->new;
