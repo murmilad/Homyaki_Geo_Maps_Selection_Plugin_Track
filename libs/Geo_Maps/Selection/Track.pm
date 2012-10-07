@@ -44,16 +44,18 @@ sub set_vertexes {
 			}
 
 			my $dounded_box = Math::Geometry::Planar->new;
-			my $bbox_points = $planar_track_contour->bbox()->points;
-			$dounded_box->points($bbox_points);
-			my $bounded_center = $dounded_box->centroid;
+			if ($planar_track_contour->bbox()){
+				my $bbox_points = $planar_track_contour->bbox()->points;
+				$dounded_box->points($bbox_points);
+				my $bounded_center = $dounded_box->centroid;
 			
-			$params->{map_center_lat} = $bounded_center->[1];
-			$params->{map_center_lng} = $bounded_center->[0];
-			$params->{bounds_sw_lat} = $bbox_points->[0]->[1];
-			$params->{bounds_sw_lng} = $bbox_points->[0]->[0];
-			$params->{bounds_ne_lat} = $bbox_points->[3]->[1];
-			$params->{bounds_ne_lng} = $bbox_points->[3]->[0];
+				$params->{map_center_lat} = $bounded_center->[1];
+				$params->{map_center_lng} = $bounded_center->[0];
+				$params->{bounds_sw_lat} = $bbox_points->[0]->[1];
+				$params->{bounds_sw_lng} = $bbox_points->[0]->[0];
+				$params->{bounds_ne_lat} = $bbox_points->[3]->[1];
+				$params->{bounds_ne_lng} = $bbox_points->[3]->[0];
+			}
 			
 		}
 #		Homyaki::Logger::print_log("Homyaki::Geo_Mas::Selection::Track file = $track_file");
