@@ -43,9 +43,11 @@ sub set_vertexes {
 				$params->{"vertex_${i}_lng"} = $track->{coordinates}->[$j-1]->[0] - 0.00003;
 			}
 
-			my $dounded_box = Math::Geometry::Planar->new;
-			if ($planar_track_contour->bbox()){
-				my $bbox_points = $planar_track_contour->bbox()->points;
+			my $bbox = $planar_track_contour->bbox();
+			if ($bbox){
+				my $bbox_points = $bbox->points;
+				
+				my $dounded_box = Math::Geometry::Planar->new;
 				$dounded_box->points($bbox_points);
 				my $bounded_center = $dounded_box->centroid;
 			
