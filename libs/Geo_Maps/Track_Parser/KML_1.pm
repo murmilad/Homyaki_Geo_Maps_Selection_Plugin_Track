@@ -24,6 +24,7 @@ use XML::Simple;
 
 use Homyaki::Logger;
 use Data::Dumper;
+
  
 sub is_actual_parser {
 	my $this = shift;
@@ -46,36 +47,54 @@ sub parse {
 
 	if ($this->{data}){
 
-		my $coordinates_hash = {};
-
-		foreach my $kml_snippet_name (keys %{$this->{data}->{Document}->{Placemark}}) {
-			if ($kml_snippet_name eq 'LineString') {
-				$coordinates_hash->{0} = $this->{data}->{Document}->{Placemark}->{$kml_snippet_name}->{coordinates};
-			} elsif ($kml_snippet_name =~ /.*\.kml-(\d+)/i) {
-				$coordinates_hash->{$1} = $this->{data}->{Document}->{Placemark}->{$kml_snippet_name}->{LineString}->{coordinates};
-			}
-		}
-
-		my $coordinates_str;
-
-		foreach my $kml_snippet_number (sort {$a <=> $b} keys %{$coordinates_hash}){
-			$coordinates_str .= $coordinates_hash->{$kml_snippet_number};
-		}
-		
 		my @coordinates;
-		foreach my $coord_line (split(/\n|\s+/, $coordinates_str)) {
-			if ($coord_line =~ /([-\d\.]+),([-\d\.]+)/){
-				push(@coordinates, [$1,$2]);
+
+		my $nodes = []; 
+
+		locate_nodes($this->{data}, 'coordinates', $nodes);
+
+		foreach my $node (@{$nodes}){
+			my @coordinates = split(/\n|\s+/, $node);
+			if (scalar(@coordinates) > 1) {
+				foreach my $coord_line (@coordinates) {
+					if ($coord_line =~ /([-\d\.]+),([-\d\.]+)/){
+						push(@{$this->{coordinates}}, [$1,$2]);
+					}
+				}
 			}
-		}
-	
-		if (scalar(@coordinates) > 0) {
-			push(@{$this->{coordinates}}, (@coordinates));
 		}
 	}
 
 
-	Homyaki::Logger::print_log('Homyaki::Geo_Maps::Track_Parser::KML_1 this = ' . Dumper($this->{coordinates}));
+#	Homyaki::Logger::print_log('Homyaki::Geo_Maps::Track_Parser::KML_1 this = ' . Dumper($this->{coordinates}));
+}
+
+sub locate_nodes {
+	my $hash   = shift;
+	my $node   = shift;
+	my $result = shift || [];
+
+	if (ref($hash) eq 'HASH'){
+		foreach my $current_node (sort {
+			my $dig_a;
+			my $dig_b;
+
+			$dig_a = $1 if $a =~ /(\d+)$/i;
+			$dig_b = $1 if $b =~ /(\d+)$/i;
+
+			if ($dig_a && $dig_b) {
+				$dig_a <=> $dig_b
+			} else {
+				$a cmp $b
+			}
+		} keys %{$hash}) {
+			if ($current_node eq $node) {
+				push(@{$result}, $hash->{$current_node});
+			} else {
+				locate_nodes($hash->{$current_node}, $node, $result);
+			}
+		}
+	}
 }
 
 1;
