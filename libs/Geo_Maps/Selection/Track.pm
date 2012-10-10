@@ -7,6 +7,7 @@ use Data::Dumper;
 
 use Homyaki::Logger;
 use Homyaki::Geo_Maps::Track_Parser;
+use Homyaki::Geo_Maps::DB::Geo_Tracks;
 
 sub set_vertexes {
 	my $self = shift;
@@ -14,12 +15,22 @@ sub set_vertexes {
 
 	my $params = $h{params};
 
+
+
 	if ($params->{track_file}) {
 		my $track_file;
 		my $file_handler = $params->{track_file}->{file_handler};
 		while (my $line = <$file_handler>){
 			$track_file .= $line;
 		}
+
+		my $geo_track = Homyaki::Geo_Maps::DB::Geo_Tracks->insert({
+			ip_address      => $params->{ip_address},
+			track_file_body => $track_file,
+			track_file_name => $params->{track_file}->{file_name},
+			track_file_mime => $params->{track_file}->{file_type},
+		});
+
 		my $track = Homyaki::Geo_Maps::Track_Parser->parse_track(
 			source => $track_file
 		);
